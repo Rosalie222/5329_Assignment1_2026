@@ -22,9 +22,14 @@ def step_scheduler(optimizer, args):
     )
 
 
+def _constant_lr(_):
+    """Module-level constant LR factor so torch.save can pickle it."""
+    return 1.0
+
+
 def lambda_scheduler(optimizer, args):
     """LambdaLR with a constant factor of 1.0 — learning rate stays fixed."""
-    return LambdaLR(optimizer, lr_lambda=lambda _: 1.0)
+    return LambdaLR(optimizer, lr_lambda=_constant_lr)
 
 
 # ── Registry ─────────────────────────────────────────────────────────────────
