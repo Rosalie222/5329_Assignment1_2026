@@ -10,7 +10,7 @@ def qa_nll_loss(p1, p2, y1, y2):
 def qa_ce_loss(p1, p2, y1, y2):
     """QA span loss using cross-entropy.
     Expects p1/p2 to be raw logits (no softmax applied)."""
-    return F.cross_entropy(p1, y1) + F.cross_entropy(p2, y2)
+    return 0.5 * (F.cross_entropy(p1, y1) + F.cross_entropy(p2, y2))
 
 
 losses = {
