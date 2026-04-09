@@ -67,13 +67,13 @@ class MultiHeadAttention(nn.Module):
         k = self.k_linear(x).view(batch_size, length, self.num_heads, self.d_k)
         v = self.v_linear(x).view(batch_size, length, self.num_heads, self.d_k)
 
-        q = q.permute(2, 0, 1, 3).contiguous().view(batch_size * self.num_heads, length, self.d_k)
-        k = k.permute(2, 0, 1, 3).contiguous().view(batch_size * self.num_heads, length, self.d_k)
-        v = v.permute(2, 0, 1, 3).contiguous().view(batch_size * self.num_heads, length, self.d_k)
+        q = q.permute(0, 2, 1, 3).contiguous().view(batch_size * self.num_heads, length, self.d_k)
+        k = k.permute(0, 2, 1, 3).contiguous().view(batch_size * self.num_heads, length, self.d_k)
+        v = v.permute(0, 2, 1, 3).contiguous().view(batch_size * self.num_heads, length, self.d_k)
 
         if mask.dtype != torch.bool:
             mask = mask.bool()
-        attn_mask = mask.unsqueeze(1).expand(-1, length, -1).repeat(self.num_heads, 1, 1)  # [B*h, L, L]
+        attn_mask = mask.unsqueeze(1).expand(-1, length, -1).repeat_interleave(self.num_heads, dim=0)  # [B*h, L, L]
 
         attn = torch.bmm(q, k.transpose(1, 2)) * self.scale
         attn = mask_logits(attn, attn_mask)
